@@ -30,4 +30,9 @@ export class SiswaController {
         return this.siswaService.getDetailSP(siswaId);
     }
 
+    @Post('upload-massal')
+    async uploadMassal(@Body() body: { data: { nama: string; kelas: string }[] }) {
+        return this.siswaService.uploadMassal(body.data);
+    }
+
 }

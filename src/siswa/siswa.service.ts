@@ -79,4 +79,11 @@ export class SiswaService {
         });
     }
 
+    async uploadMassal(data: { nama: string; kelas: string }[]) {
+        return this.prisma.siswa.createMany({
+            data: data,
+            skipDuplicates: true, // Hindari duplikasi
+        });
+    }
+
 }
