@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+}
+
+model Siswa {
+  id             String           @id @default(uuid())
+  nama           String
+  kelas          String
+  spCount        Int              @default(0)
+  suratPembinaan SuratPembinaan[]
+}
+
+model SuratPembinaan {
+  id         String   @id @default(uuid())
+  siswaId    String
+  siswa      Siswa    @relation(fields: [siswaId], references: [id])
+  keterangan String
+  tanggal    DateTime @default(now())
+}
