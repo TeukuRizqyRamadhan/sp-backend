@@ -10,6 +10,14 @@ export class SiswaController {
         return this.siswaService.searchSiswa(nama);
     }
 
+    @Get()
+    async getAllSiswa(@Query('page') page = '1', @Query('limit') limit = '10') {
+        const pageNumber = parseInt(page, 10);
+        const limitNumber = parseInt(limit, 10);
+        return this.siswaService.getAllSiswa(pageNumber, limitNumber);
+    }
+
+
     @Post('sp')
     async buatSP(@Body() body: { siswaId: string; keterangan: string }) {
         return this.siswaService.buatSP(body.siswaId, body.keterangan);

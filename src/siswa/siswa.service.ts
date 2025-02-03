@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SiswaService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async searchSiswa(nama: string) {
     try {
@@ -27,13 +27,23 @@ export class SiswaService {
       });
       if (!siswa) throw new Error('Siswa tidak ditemukan');
 
-      return await this.prisma.suratPembinaan.create({
+      // Buat SP baru
+      const newSP = await this.prisma.suratPembinaan.create({
         data: { siswaId, keterangan },
       });
+
+      // Update spCount di tabel siswa
+      await this.prisma.siswa.update({
+        where: { id: siswaId },
+        data: { spCount: { increment: 1 } }, // Menambah 1 ke spCount
+      });
+
+      return newSP;
     } catch (error) {
       throw new Error(`Error membuat SP: ${error.message}`);
     }
   }
+
 
   async countSP(siswaId: string) {
     try {
@@ -68,7 +78,7 @@ export class SiswaService {
       if (siswaTerbanyakSP.length > 0) {
         const siswaDetail = await this.prisma.siswa.findUnique({
           where: { id: siswaTerbanyakSP[0].siswaId },
-          select: { nama: true },
+          select: { nama: true, kelas: true },
         });
 
         return {
@@ -76,9 +86,10 @@ export class SiswaService {
           totalSiswaKenaSP,
           siswaTerbanyakSP: siswaDetail
             ? {
-                nama: siswaDetail.nama,
-                jumlahSP: siswaTerbanyakSP[0]._count.siswaId,
-              }
+              nama: siswaDetail.nama,
+              kelas: siswaDetail.kelas,
+              jumlahSP: siswaTerbanyakSP[0]._count.siswaId,
+            }
             : null,
         };
       }
@@ -104,6 +115,28 @@ export class SiswaService {
       throw new Error(`Error mendapatkan detail SP: ${error.message}`);
     }
   }
+
+  async getAllSiswa(page: number, limit: number) {
+    try {
+      const skip = (page - 1) * limit;
+
+      const siswa = await this.prisma.siswa.findMany({
+        skip,
+        take: limit,
+        orderBy: { nama: 'asc' }, // Urutkan berdasarkan nama
+      });
+
+      const totalSiswa = await this.prisma.siswa.count();
+
+      return {
+        siswa,
+        totalPages: Math.ceil(totalSiswa / limit),
+      };
+    } catch (error) {
+      throw new Error(`Error mendapatkan daftar siswa: ${error.message}`);
+    }
+  }
+
 
   async uploadMassal(data: { nama: string; kelas: string }[]) {
     try {
