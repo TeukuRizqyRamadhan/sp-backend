@@ -68,7 +68,7 @@ export class SiswaService {
       if (siswaTerbanyakSP.length > 0) {
         const siswaDetail = await this.prisma.siswa.findUnique({
           where: { id: siswaTerbanyakSP[0].siswaId },
-          select: { nama: true },
+          select: { nama: true, kelas: true },
         });
 
         return {
@@ -77,6 +77,7 @@ export class SiswaService {
           siswaTerbanyakSP: siswaDetail
             ? {
                 nama: siswaDetail.nama,
+                kelas: siswaDetail.kelas,
                 jumlahSP: siswaTerbanyakSP[0]._count.siswaId,
               }
             : null,
