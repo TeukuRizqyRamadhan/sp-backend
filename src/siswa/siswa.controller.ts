@@ -43,4 +43,9 @@ export class SiswaController {
         return this.siswaService.uploadMassal(body.data);
     }
 
+    @Get('leaderboard-sp')
+    async getLeaderboardSP() {
+        return this.siswaService.getLeaderboardSP();
+    }
+
 }

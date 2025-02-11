@@ -99,6 +99,18 @@ export class SiswaService {
     }
   }
 
+  async getLeaderboardSP() {
+    try {
+      return await this.prisma.siswa.findMany({
+        orderBy: { spCount: 'desc' },
+        select: { id: true, nama: true, kelas: true, spCount: true },
+        take: 5,
+      });
+    } catch (error) {
+      throw new Error(`Error mendapatkan leaderboard SP: ${error.message}`);
+    }
+  }
+
   async getDetailSP(siswaId: string) {
     try {
       return await this.prisma.suratPembinaan.findMany({
