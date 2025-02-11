@@ -27,9 +27,18 @@ export class SiswaService {
       });
       if (!siswa) throw new Error('Siswa tidak ditemukan');
 
-      return await this.prisma.suratPembinaan.create({
+      // Buat SP baru
+      const newSP = await this.prisma.suratPembinaan.create({
         data: { siswaId, keterangan },
       });
+
+      // Update spCount di tabel siswa
+      await this.prisma.siswa.update({
+        where: { id: siswaId },
+        data: { spCount: { increment: 1 } }, // Menambah 1 ke spCount
+      });
+
+      return newSP;
     } catch (error) {
       throw new Error(`Error membuat SP: ${error.message}`);
     }
@@ -103,6 +112,27 @@ export class SiswaService {
       });
     } catch (error) {
       throw new Error(`Error mendapatkan detail SP: ${error.message}`);
+    }
+  }
+
+  async getAllSiswa(page: number, limit: number) {
+    try {
+      const skip = (page - 1) * limit;
+
+      const siswa = await this.prisma.siswa.findMany({
+        skip,
+        take: limit,
+        orderBy: { nama: 'asc' }, // Urutkan berdasarkan nama
+      });
+
+      const totalSiswa = await this.prisma.siswa.count();
+
+      return {
+        siswa,
+        totalPages: Math.ceil(totalSiswa / limit),
+      };
+    } catch (error) {
+      throw new Error(`Error mendapatkan daftar siswa: ${error.message}`);
     }
   }
 
