@@ -17,7 +17,6 @@ export class SiswaController {
     return this.siswaService.getAllSiswa(pageNumber, limitNumber);
   }
 
-
   @Post('sp')
   async buatSP(@Body() body: { siswaId: string; jenisPelanggaran: string; keterangan: string }) {
     return this.siswaService.buatSP(body.siswaId, body.jenisPelanggaran, body.keterangan);
@@ -47,5 +46,4 @@ export class SiswaController {
   async getLeaderboardSP() {
     return this.siswaService.getLeaderboardSP();
   }
-
 }

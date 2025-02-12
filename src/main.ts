@@ -4,9 +4,9 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Mengaktifkan CORS agar bisa diakses dari frontend React
+  // CORS
   app.enableCors({
-    origin: '*', // Sesuaikan dengan URL frontend
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Jika menggunakan cookie atau token dalam header
   });

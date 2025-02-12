@@ -35,7 +35,7 @@ export class SiswaService {
       // Update spCount di tabel siswa
       await this.prisma.siswa.update({
         where: { id: siswaId },
-        data: { spCount: { increment: 1 } }, // Menambah 1 ke spCount
+        data: { spCount: { increment: 1 } },
       });
 
       return newSP;
@@ -135,7 +135,7 @@ export class SiswaService {
       const siswa = await this.prisma.siswa.findMany({
         skip,
         take: limit,
-        orderBy: { nama: 'asc' }, // Urutkan berdasarkan nama
+        orderBy: { nama: 'asc' },
       });
 
       const totalSiswa = await this.prisma.siswa.count();
