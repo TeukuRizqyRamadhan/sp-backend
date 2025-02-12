@@ -22,9 +22,10 @@ model Siswa {
 }
 
 model SuratPembinaan {
-  id         String   @id @default(uuid())
-  siswaId    String
-  siswa      Siswa    @relation(fields: [siswaId], references: [id], onDelete: Cascade)
-  keterangan String
-  tanggal    DateTime @default(now())
+  id                String   @id @default(uuid())
+  siswaId          String
+  siswa            Siswa    @relation(fields: [siswaId], references: [id], onDelete: Cascade)
+  jenisPelanggaran String?
+  keterangan       String
+  tanggal           DateTime @default(now())
 }

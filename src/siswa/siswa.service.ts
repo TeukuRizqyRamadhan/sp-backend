@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SiswaService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async searchSiswa(nama: string) {
     try {
@@ -20,8 +20,10 @@ export class SiswaService {
     }
   }
 
-  async buatSP(siswaId: string, keterangan: string) {
+  async buatSP(siswaId: string, jenisPelanggaran: string, keterangan: string) {
     try {
+      console.log('Data Masuk:', { siswaId, jenisPelanggaran, keterangan });
+
       const siswa = await this.prisma.siswa.findUnique({
         where: { id: siswaId },
       });
@@ -29,7 +31,7 @@ export class SiswaService {
 
       // Buat SP baru
       const newSP = await this.prisma.suratPembinaan.create({
-        data: { siswaId, keterangan },
+        data: { siswaId, jenisPelanggaran, keterangan },
       });
 
       // Update spCount di tabel siswa
@@ -85,10 +87,10 @@ export class SiswaService {
           totalSiswaKenaSP,
           siswaTerbanyakSP: siswaDetail
             ? {
-              nama: siswaDetail.nama,
-              kelas: siswaDetail.kelas,
-              jumlahSP: siswaTerbanyakSP[0]._count.siswaId,
-            }
+                nama: siswaDetail.nama,
+                kelas: siswaDetail.kelas,
+                jumlahSP: siswaTerbanyakSP[0]._count.siswaId,
+              }
             : null,
         };
       }
@@ -117,6 +119,7 @@ export class SiswaService {
         where: { siswaId },
         select: {
           id: true,
+          jenisPelanggaran: true,
           keterangan: true,
           tanggal: true,
         },
