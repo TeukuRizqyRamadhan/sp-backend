@@ -3,7 +3,7 @@ import { SiswaService } from './siswa.service';
 
 @Controller('siswa')
 export class SiswaController {
-  constructor(private readonly siswaService: SiswaService) {}
+  constructor(private readonly siswaService: SiswaService) { }
 
   @Get('search')
   async searchSiswa(@Query('nama') nama: string) {
@@ -17,20 +17,10 @@ export class SiswaController {
     return this.siswaService.getAllSiswa(pageNumber, limitNumber);
   }
 
+
   @Post('sp')
-  async buatSP(
-    @Body()
-    body: {
-      siswaId: string;
-      jenisPelanggaran: string;
-      keterangan: string;
-    },
-  ) {
-    return this.siswaService.buatSP(
-      body.siswaId,
-      body.jenisPelanggaran,
-      body.keterangan,
-    );
+  async buatSP(@Body() body: { siswaId: string; jenisPelanggaran: string; keterangan: string }) {
+    return this.siswaService.buatSP(body.siswaId, body.jenisPelanggaran, body.keterangan);
   }
 
   @Get(':id/sp-count')
@@ -49,9 +39,7 @@ export class SiswaController {
   }
 
   @Post('upload-massal')
-  async uploadMassal(
-    @Body() body: { data: { nama: string; kelas: string }[] },
-  ) {
+  async uploadMassal(@Body() body: { data: { nama: string; kelas: string }[] }) {
     return this.siswaService.uploadMassal(body.data);
   }
 
@@ -59,4 +47,5 @@ export class SiswaController {
   async getLeaderboardSP() {
     return this.siswaService.getLeaderboardSP();
   }
+
 }
