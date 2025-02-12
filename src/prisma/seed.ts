@@ -15,15 +15,15 @@ async function main() {
   });
 
   // Tambah Siswa
-  await prisma.siswa.create({
-    data: {
-      nama: 'ADITHYA SUNANTA',
-      spCount: 0,
-      kelas: '7A',
-    },
-  });
+  // await prisma.siswa.create({
+  //   data: {
+  //     nama: 'ADITHYA SUNANTA',
+  //     spCount: 0,
+  //     kelas: '7A',
+  //   },
+  // });
 
-  console.log('Admin dan Siswa berhasil ditambahkan!');
+  console.log('Admin berhasil ditambahkan!');
 }
 
 main()

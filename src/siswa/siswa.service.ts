@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SiswaService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async searchSiswa(nama: string) {
     try {
@@ -85,10 +85,10 @@ export class SiswaService {
           totalSiswaKenaSP,
           siswaTerbanyakSP: siswaDetail
             ? {
-                nama: siswaDetail.nama,
-                kelas: siswaDetail.kelas,
-                jumlahSP: siswaTerbanyakSP[0]._count.siswaId,
-              }
+              nama: siswaDetail.nama,
+              kelas: siswaDetail.kelas,
+              jumlahSP: siswaTerbanyakSP[0]._count.siswaId,
+            }
             : null,
         };
       }
@@ -96,6 +96,18 @@ export class SiswaService {
       return { totalSiswa, totalSiswaKenaSP, siswaTerbanyakSP: null };
     } catch (error) {
       throw new Error(`Error mendapatkan statistik SP: ${error.message}`);
+    }
+  }
+
+  async getLeaderboardSP() {
+    try {
+      return await this.prisma.siswa.findMany({
+        orderBy: { spCount: 'desc' },
+        select: { id: true, nama: true, kelas: true, spCount: true },
+        take: 5,
+      });
+    } catch (error) {
+      throw new Error(`Error mendapatkan leaderboard SP: ${error.message}`);
     }
   }
 
