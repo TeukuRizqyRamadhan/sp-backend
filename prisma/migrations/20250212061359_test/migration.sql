@@ -21,8 +21,9 @@ CREATE TABLE "Siswa" (
 CREATE TABLE "SuratPembinaan" (
     "id" TEXT NOT NULL,
     "siswaId" TEXT NOT NULL,
+    "jenisPelanggaran" TEXT,
     "keterangan" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tanggal" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "SuratPembinaan_pkey" PRIMARY KEY ("id")
 );
@@ -31,4 +32,4 @@ CREATE TABLE "SuratPembinaan" (
 CREATE UNIQUE INDEX "Admin_email_key" ON "Admin"("email");
 
 -- AddForeignKey
-ALTER TABLE "SuratPembinaan" ADD CONSTRAINT "SuratPembinaan_siswaId_fkey" FOREIGN KEY ("siswaId") REFERENCES "Siswa"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SuratPembinaan" ADD CONSTRAINT "SuratPembinaan_siswaId_fkey" FOREIGN KEY ("siswaId") REFERENCES "Siswa"("id") ON DELETE CASCADE ON UPDATE CASCADE;
