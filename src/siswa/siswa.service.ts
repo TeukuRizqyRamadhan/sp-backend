@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -182,4 +182,76 @@ export class SiswaService {
       throw new Error(`Error upload data massal: ${error.message}`);
     }
   }
+
+  async getExportSP(filter: string, date: string) {
+    try {
+      let whereClause: any = {};
+
+      if (!date || isNaN(Date.parse(date)) && filter !== 'tahun') {
+        throw new BadRequestException('Tanggal tidak valid');
+      }
+
+      if (filter === 'hari') {
+        const startDate = new Date(date);
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 1);
+
+        whereClause.tanggal = {
+          gte: startDate,
+          lt: endDate,
+        };
+      } else if (filter === 'bulan') {
+        const startDate = new Date(`${date}-01`);
+        if (isNaN(startDate.getTime())) {
+          throw new BadRequestException('Format bulan tidak valid');
+        }
+
+        const endDate = new Date(startDate);
+        endDate.setMonth(endDate.getMonth() + 1);
+
+        whereClause.tanggal = {
+          gte: startDate,
+          lt: endDate,
+        };
+      } else if (filter === 'tahun') {
+        const year = parseInt(date, 10);
+        if (isNaN(year) || year < 2000 || year > 2100) {
+          throw new BadRequestException('Tahun tidak valid');
+        }
+
+        const startDate = new Date(`${year}-01-01`);
+        const endDate = new Date(`${year + 1}-01-01`);
+
+        whereClause.tanggal = {
+          gte: startDate,
+          lt: endDate,
+        };
+      } else {
+        throw new BadRequestException('Filter tidak valid');
+      }
+
+      const results = await this.prisma.suratPembinaan.findMany({
+        where: whereClause,
+        select: {
+          id: true,
+          jenisPelanggaran: true,
+          keterangan: true,
+          tanggal: true,
+          siswa: { select: { nama: true, spCount: true } },
+        },
+        orderBy: { tanggal: 'desc' },
+      });
+
+      // Ubah struktur data agar nama siswa berada di level atas
+      return results.map((item) => ({
+        ...item,
+        nama: item.siswa?.nama || 'Tidak diketahui',
+        spCount: item.siswa?.spCount || 0,
+        siswa: undefined, // Hilangkan properti siswa agar lebih bersih
+      }));
+    } catch (error) {
+      throw new Error(`Error mengekspor data SP: ${error.message}`);
+    }
+  }
+
 }

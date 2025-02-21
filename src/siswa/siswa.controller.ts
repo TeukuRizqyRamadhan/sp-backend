@@ -1,5 +1,8 @@
-import { Controller, Get, Post, Query, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body, Param, Res } from '@nestjs/common';
 import { SiswaService } from './siswa.service';
+import { Response } from 'express';
+import * as json2csv from 'json2csv';
+import { Parser } from 'json2csv';
 
 @Controller('siswa')
 export class SiswaController {
@@ -23,7 +26,7 @@ export class SiswaController {
   }
 
   @Get(':id/sp-count')
-  async countSP(@Query('id') siswaId: string) {
+  async countSP(@Param('id') siswaId: string) {
     return this.siswaService.countSP(siswaId);
   }
 
@@ -46,4 +49,36 @@ export class SiswaController {
   async getLeaderboardSP() {
     return this.siswaService.getLeaderboardSP();
   }
+
+  @Get('export-sp')
+  async exportSP(@Query('filter') filter: string, @Query('date') date: string, @Res() res: Response) {
+    try {
+      const data = await this.siswaService.getExportSP(filter, date);
+
+      if (!data || data.length === 0) {
+        return res.status(404).send('Tidak ada data yang tersedia.');
+      }
+
+      const orderedData = data.map((item, index) => ({
+        no: index + 1, // Tambahkan nomor urut mulai dari 1
+        nama: item.nama,
+        jenisPelanggaran: item.jenisPelanggaran,
+        keterangan: item.keterangan,
+        totalsp: item.spCount,
+        tanggal: item.tanggal
+      }));
+
+      const fields = ["no", "nama", "jenisPelanggaran", "keterangan", "totalsp", "tanggal"]; // Tentukan urutan kolom
+      const json2csvParser = new Parser({ fields });
+      const csv = json2csvParser.parse(orderedData);
+
+      res.header('Content-Type', 'text/csv');
+      res.attachment('export_sp.csv');
+      res.send(csv);
+    } catch (error) {
+      console.error('Error saat ekspor SP:', error);
+      res.status(500).send('Terjadi kesalahan pada server.');
+    }
+  }
+
 }
